@@ -7,9 +7,9 @@ on:
   workflow_dispatch:
     inputs:
       ref:
-        description: "Branch, tag or commit of Niko-Cam-Plus to build"
+        description: "Branch, tag or commit of Niko-Cam-Plus to build (required; it must contain ci/read-version.sh)"
         type: string
-        default: "ccr-c3bd382f-xzjgnt"
+        required: true
       notes:
         description: "Release notes shown in the app's update card"
         type: string
@@ -60,6 +60,15 @@ jobs:
           path: src
           persist-credentials: false
 
+      # One tested reader for the version (ci/test-read-version.sh runs in the source repo's Android Build).
+      # It fails on a missing or duplicated versionCode/versionName.
+      - name: Read the app version
+        id: ver
+        working-directory: src
+        run: |
+          bash ci/read-version.sh app/build.gradle.kts | tee "$RUNNER_TEMP/version.txt"
+          cat "$RUNNER_TEMP/version.txt" >> "$GITHUB_OUTPUT"
+
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -100,6 +109,56 @@ jobs:
         working-directory: src
         run: ./gradlew assembleRelease --stacktrace
 
+      # The APK that was actually built must be the app and the version the source says it is.
+      - name: Verify the APK package and version (aapt2 badging)
+        env:
+          WANT_CODE: ${{ steps.ver.outputs.versionCode }}
+          WANT_NAME: ${{ steps.ver.outputs.versionName }}
+        run: |
+          APK=src/app/build/outputs/apk/release/app-release.apk
+          BADGING=$("$ANDROID_HOME/build-tools/36.0.0/aapt2" dump badging "$APK" | grep -m1 '^package:')
+          echo "$BADGING"
+          PKG=$(sed -nE "s/.* name='([^']*)'.*/\1/p" <<< "$BADGING")
+          CODE=$(sed -nE "s/.* versionCode='([^']*)'.*/\1/p" <<< "$BADGING")
+          NAME=$(sed -nE "s/.* versionName='([^']*)'.*/\1/p" <<< "$BADGING")
+          if [ "$PKG" != "com.nikoezveracamspiral" ]; then
+            echo "::error::APK package is '$PKG', expected com.nikoezveracamspiral."
+            exit 1
+          fi
+          if [ "$CODE" != "$WANT_CODE" ] || [ "$NAME" != "$WANT_NAME" ]; then
+            echo "::error::APK is $NAME ($CODE) but build.gradle.kts says $WANT_NAME ($WANT_CODE)."
+            exit 1
+          fi
+
+      # A real publish must move the channel forward. An unreachable version.json fails a real publish (we cannot
+      # prove the version is newer); a 404 means nothing was ever published, which is allowed. A dry run only warns.
+      - name: Check the version is newer than the live one
+        env:
+          NEW_CODE: ${{ steps.ver.outputs.versionCode }}
+          PUBLISH: ${{ inputs.publish }}
+          REPO: ${{ github.repository }}
+        run: |
+          problem() {
+            if [ "$PUBLISH" = "true" ]; then echo "::error::$1"; exit 1; else echo "::warning::$1 (dry run, continuing)"; exit 0; fi
+          }
+          URL="https://raw.githubusercontent.com/${REPO}/never-spiral-apk-builds/version.json?nocache=$(date +%s)"
+          HTTP=$(curl -sS --max-time 30 --retry 3 --retry-all-errors -o "$RUNNER_TEMP/live.json" -w '%{http_code}' "$URL") || HTTP="000"
+          if [ "$HTTP" = "404" ]; then
+            echo "No live version.json (HTTP 404): treating this as the first publish."
+            exit 0
+          fi
+          if [ "$HTTP" != "200" ]; then
+            problem "Could not read the live version.json (HTTP $HTTP), so the new versionCode cannot be compared."
+          fi
+          LIVE=$(jq -r '.versionCode // empty' "$RUNNER_TEMP/live.json" 2>/dev/null || true)
+          if ! [[ "$LIVE" =~ ^[0-9]+$ ]]; then
+            problem "The live version.json has no numeric versionCode."
+          fi
+          echo "Live versionCode $LIVE, new versionCode $NEW_CODE"
+          if [ "$NEW_CODE" -le "$LIVE" ]; then
+            problem "versionCode $NEW_CODE is not strictly greater than the live $LIVE."
+          fi
+
       # Never publish a build signed with the committed debug key: installed apps could not update to it.
       - name: Verify the signing key
         id: sign
@@ -127,15 +186,53 @@ jobs:
           if-no-files-found: error
           retention-days: 3
 
+      # This repository (public) holds CHANGELOG.md, which becomes the GitHub Release body.
+      - name: Check out this repository (changelog)
+        uses: actions/checkout@v4
+        with:
+          path: rel
+          persist-credentials: false
+
+      # A dry run never publishes, so a missing changelog section is only a warning here; a real publish fails below.
+      - name: Check the changelog has this version (dry run)
+        if: ${{ !inputs.publish }}
+        env:
+          VERSION_NAME: ${{ steps.ver.outputs.versionName }}
+        run: |
+          # Literal prefix match (no regex), so the dots in the version are not wildcards.
+          if ! awk -v h="## [${VERSION_NAME}]" 'substr($0, 1, length(h)) == h { found = 1 } END { exit !found }' rel/CHANGELOG.md; then
+            echo "::warning::CHANGELOG.md has no '## [${VERSION_NAME}]' section; a real publish would fail."
+          fi
+
+      # Sole publisher. Order matters: the signing check above has already passed. The tag is checked before anything
+      # is pushed so an existing release is never overwritten; the single-commit branch is what installed apps read,
+      # and the v<versionName> tag plus release asset are the rollback trail (the tag keeps the pushed commit reachable).
       - name: Publish to the update channel
         if: ${{ inputs.publish }}
         env:
           NOTES: ${{ inputs.notes }}
           REPO: ${{ github.repository }}
           PUSH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_CODE: ${{ steps.ver.outputs.versionCode }}
+          VERSION_NAME: ${{ steps.ver.outputs.versionName }}
         run: |
-          VERSION_CODE=$(grep -oP 'versionCode\s*=\s*\K[0-9]+' src/app/build.gradle.kts)
-          VERSION_NAME=$(grep -oP 'versionName\s*=\s*"\K[^"]+' src/app/build.gradle.kts)
+          TAG="v${VERSION_NAME}"
+          if gh api "repos/${REPO}/git/ref/tags/${TAG}" > /dev/null 2>&1; then
+            echo "::error::Tag ${TAG} already exists; refusing to publish over it."
+            exit 1
+          fi
+          # Literal prefix match (no regex), so the dots in the version are not wildcards. Checked before any push.
+          HEADING="## [${VERSION_NAME}]"
+          if ! awk -v h="$HEADING" 'substr($0, 1, length(h)) == h { found = 1 } END { exit !found }' rel/CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no '${HEADING}' section; add it before publishing."
+            exit 1
+          fi
+          awk -v h="$HEADING" 'substr($0, 1, length(h)) == h { grab = 1; next } grab && substr($0, 1, 4) == "## [" { exit } grab' \
+            rel/CHANGELOG.md > /tmp/release-notes.md
+          if [ -n "$NOTES" ]; then
+            printf '\n### Release notes\n\n%s\n' "$NOTES" >> /tmp/release-notes.md
+          fi
           mkdir -p /tmp/out && cp src/app/build/outputs/apk/release/app-release.apk /tmp/out/niko-cam-release.apk
           SHA=$(sha256sum /tmp/out/niko-cam-release.apk | cut -d' ' -f1)
           BASE="https://raw.githubusercontent.com/${REPO}/never-spiral-apk-builds"
@@ -149,4 +246,8 @@ jobs:
           git add niko-cam-release.apk version.json
           git commit -q -m "Niko's Cam ${VERSION_NAME} (${VERSION_CODE})"
           git push --force "https://x-access-token:${PUSH_TOKEN}@github.com/${REPO}.git" HEAD:never-spiral-apk-builds
-          echo "Published ${VERSION_NAME} (${VERSION_CODE}), signer ${{ steps.sign.outputs.cert }}" >> "$GITHUB_STEP_SUMMARY"
+          cp niko-cam-release.apk "niko-cam-${VERSION_NAME}.apk"
+          gh release create "$TAG" "niko-cam-${VERSION_NAME}.apk" version.json \
+            --repo "$REPO" --target "$(git rev-parse HEAD)" \
+            --title "Niko's Cam ${VERSION_NAME}" --notes-file /tmp/release-notes.md
+          echo "Published ${VERSION_NAME} (${VERSION_CODE}), tag ${TAG}, signer ${{ steps.sign.outputs.cert }}" >> "$GITHUB_STEP_SUMMARY"
