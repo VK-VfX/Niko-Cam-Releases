@@ -7,6 +7,16 @@ for each version uses its section of this file as the release notes.
 
 - Nothing yet
 
+## [2.18.1] - 2026-11-23
+
+### Changed
+- New names throughout the app. The night engine is now **Deep Night** (the Night chip reads "Deep"), the burst-merge HDR is now **Burst HDR**, and the looks category is now **Studio**, with Soft Natural, Deep Shadow, Cream and Studio Classic replacing the old names.
+- Saved-photo notes now say "Night merge" and "Burst HDR". Photos taken earlier keep the text they were saved with.
+- Your saved looks and settings carry over unchanged.
+
+### Known issue
+- In dim light, Burst HDR can render shadows darker than the viewfinder shows. Turn Burst HDR off for now. A proper fix is being designed.
+
 ## [2.18.0] - 2026-11-23
 
 ### Changed
