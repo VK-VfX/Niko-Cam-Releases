@@ -121,8 +121,14 @@ jobs:
           PKG=$(sed -nE "s/.* name='([^']*)'.*/\1/p" <<< "$BADGING")
           CODE=$(sed -nE "s/.* versionCode='([^']*)'.*/\1/p" <<< "$BADGING")
           NAME=$(sed -nE "s/.* versionName='([^']*)'.*/\1/p" <<< "$BADGING")
-          if [ "$PKG" != "com.nikoezveracamspiral" ]; then
-            echo "::error::APK package is '$PKG', expected com.nikoezveracamspiral."
+          # The expected package is the app's applicationId from the source (not the Kotlin namespace).
+          WANT_PKG=$(grep -oP 'applicationId\s*=\s*"\K[^"]+' src/app/build.gradle.kts | head -n1)
+          if [ -z "$WANT_PKG" ]; then
+            echo "::error::Could not read applicationId from src/app/build.gradle.kts."
+            exit 1
+          fi
+          if [ "$PKG" != "$WANT_PKG" ]; then
+            echo "::error::APK package does not match the applicationId in build.gradle.kts."
             exit 1
           fi
           if [ "$CODE" != "$WANT_CODE" ] || [ "$NAME" != "$WANT_NAME" ]; then
