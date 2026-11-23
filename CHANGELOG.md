@@ -7,6 +7,23 @@ for each version uses its section of this file as the release notes.
 
 - Nothing yet
 
+## [2.18.0] - 2026-11-23
+
+### Changed
+- Sharper, cleaner photos: sharpening now works on brightness only and runs before film grain, so it no longer amplifies grain or colour noise or fringes coloured edges.
+- Night, HDR+ and Realistic keep their colours: street lamps, skin and sky no longer shift hue when the shadows are lifted.
+- Exposure fusion blends in linear light, with fewer halos around bright edges.
+- Saturation, vibrance and the shadow/highlight weighting now use a P3 brightness weighting, so looks shift slightly compared with 2.17.
+- The viewfinder match no longer clips colour channels separately when it brightens.
+- Photos are tagged with the colour space they really have.
+
+### Fixed
+- Long manual exposures (up to 30 s) no longer time out.
+- Ultra HDR gain maps are dropped when a lens warp or close-up crop changed the picture's geometry, instead of lighting the wrong areas.
+
+### Security
+- Safer updates: the update check rejects malformed or oversized update information, and an update is refused with a clear message if the downloaded file is for another app or signed with a different key.
+
 ## [2.17.20] - 2026-11-23
 
 ### Fixed
