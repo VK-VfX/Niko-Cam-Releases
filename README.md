@@ -29,6 +29,9 @@ that version's section of `CHANGELOG.md` as the notes. A real release fails if
 
 ## Signing
 
-Releases are signed with the Nikezvera release key. The certificate SHA-256 begins
-`5D:1E:B0:A9:2F:DF`. The full value is printed in the "Verify the signing key" step of
-each release run; it will be added here after the next dry run.
+Releases are signed with the Nikezvera release key. Certificate SHA-256 fingerprint:
+
+`5D:1E:B0:A9:2F:DF:E3:A6:41:28:72:11:4B:6F:4A:94:B2:16:4C:FA:64:F2:42:05:E0:7F:76:BF:14:09:B8:0F`
+
+Each release run prints the signer certificate in its "Verify the signing key" step and
+refuses to publish if it does not match this key, or if the APK is signed with the debug key.
