@@ -7,6 +7,27 @@ for each version uses its section of this file as the release notes.
 
 - Nothing yet
 
+## [2.19.3] - 2026-11-24
+
+### Changed
+- Front-camera selfies in dim light now take one frame metered on your face and keep exactly what the camera collected. The old path cut the exposure by 1.1 stops and then lifted the shadows, which produced noisy, crushed, painterly selfies. The effect on picture quality is not yet confirmed on the phone, so please compare a dim selfie against your usual camera and send a report.
+- A new quick sheet opens from the format pill, with General and Pro tabs. Timer, ratio, format and grid are in General. Ultra HDR, quality, Burst HDR strength and the viewfinder aids are in Pro.
+- Settings now has three tabs: Smart, Stamp and Phone. Controls that were shown twice (flash, ratio, RAW/JPEG, aids) now have one home each.
+- The timer has a home on the camera screen: the format pill shows it, and the sheet sets it.
+- The header reads Settings, the chip reads Burst HDR, and the info icon is labelled About.
+
+### Added
+- Every photo now saves a small record of how it was taken (exposure, frames, noise and edge modes, timings), shown in Diagnostics. It holds no personal data and keeps the newest 200 shots.
+- Settings > Phone > Testing has two switches: the front low-light route and mirroring by the file's orientation tag. Turn the first off to get the previous front-camera behaviour back.
+
+### Fixed
+- Choosing Off in the flash settings no longer lights the torch for a moment on the way.
+
+### Known issues
+- Burst HDR can still render dim scenes darker than the viewfinder on the back camera. Turn it off for now.
+- Tap-to-meter may land slightly off-centre when zoomed in. It is being checked.
+- Mirrored selfies kept as the camera's own file rely on an orientation tag. If a gallery shows one flipped, turn off the mirror-by-tag switch in Testing.
+
 ## [2.18.1] - 2026-11-23
 
 ### Changed
