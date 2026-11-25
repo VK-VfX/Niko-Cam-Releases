@@ -7,6 +7,21 @@ for each version uses its section of this file as the release notes.
 
 - Nothing yet
 
+## [3.0.0-beta.3] - 2026-11-25
+
+### Fixed
+- Daylight photos are no longer handed to the Deep Night engine. Photo mode now hands off only in genuinely dark light (very high ISO and a long exposure).
+- The DEEP NIGHT box in the stamp appears only on photos shot in the Night section.
+- Multi-frame photos keep the viewfinder's brightness (the result is held to within about a third of a stop of the preview), and the exposure-drift log now reads the right frame.
+- The stamp logo is the real app icon again, not a redrawn copy.
+
+### Added
+- Video ratio: video has the same ratio choices as photo (in the quick sheet, General tab). When the camera has no native size for a ratio, the clip is recorded at the normal size and cropped afterwards; the full-frame original is kept if the crop fails.
+- Mode-bar scrub: the highlight follows your finger across the modes, with a light tick per mode, and settles on release. It works on the classic and the new bar, and on swiping the picture.
+
+### Known issues
+- Beta. The video crop's rotation and the scrub feel are unverified on a phone: please try a portrait 1:1 clip, a landscape 4:3 clip, and scrubbing both bars.
+
 ## [3.0.0-beta.2] - 2026-11-25
 
 Second beta of the 3.0 line: more consistent photos, a new Settings page, a safety net for shots, and the first stage of the new interface (opt-in).
