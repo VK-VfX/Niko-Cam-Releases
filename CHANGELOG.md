@@ -7,6 +7,32 @@ for each version uses its section of this file as the release notes.
 
 - Nothing yet
 
+## [3.0.0-beta.2] - 2026-11-25
+
+Second beta of the 3.0 line: more consistent photos, a new Settings page, a safety net for shots, and the first stage of the new interface (opt-in).
+
+### Fixed
+- Front-camera photos taken without flash no longer come out grainy and washed while flash photos look clean. The still frame was allowed a 60 fps range, so the camera picked a very short exposure with huge gain (about ISO 7500 effective); it now follows the preview's own range.
+- Deep Night photos from the camera's night engine now carry their details (lens, aperture, shutter, ISO, date, place) in the stamp.
+- The own-merge Night mode limits the number of frames and the shutter time when your hand is shaking, instead of merging twelve blurry frames.
+
+### Added
+- DEEP NIGHT box in the stamp: a small bordered label in every layout, shown together with the other items.
+- Rough place name in the stamp ("Shah Alam, Selangor"), worked out on the phone from a bundled city list. Nothing is looked up online and no permission is added. A switch shows coordinates instead. City data: GeoNames, CC BY 4.0.
+- Never-lose-a-shot safety net: every shot is journalled when its first copy is saved. If the app is closed while a photo is still being finished, the next launch keeps that copy and tells you.
+- New Settings page: one solid sheet with sections (Photo, Stamp, Privacy, Help and app, Advanced), a "Photo intelligence" card that shows what runs automatically, and an Advanced fold for rare options and the comparison tests.
+- First-run welcome for fresh installs (existing installs skip it).
+- New interface, first stage (opt-in): a cleaner top band, a tool tray, a mode carousel (swipe the bar or the picture) and a Look and tone dock. Turn it on with the "New interface" switch at the top of Settings. After two launches that fail to draw, the app falls back to the classic screen by itself.
+- Each photo's record now logs how far the saved exposure drifted from the viewfinder.
+
+### Changed
+- Scene detection is always on and has no setting.
+
+### Known issues
+- This is a beta. Several changes could only be tested on the build server, not on a phone. Please report anything odd with Diagnostics > Report a problem.
+- The new interface is only its first stage: the viewer, editor, player and landscape layout still use the classic design.
+- Place names rely on a bundled list. If you see coordinates instead of a name, tell me.
+
 ## [3.0.0-beta.1] - 2026-11-25
 
 First build of the 3.0 line. The camera, quick sheet and stamp upgrades are in; the full interface redesign and the new Settings page come in the next betas.
