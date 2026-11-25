@@ -7,6 +7,32 @@ for each version uses its section of this file as the release notes.
 
 - Nothing yet
 
+## [3.0.0-beta.1] - 2026-11-25
+
+First build of the 3.0 line. The camera, quick sheet and stamp upgrades are in; the full interface redesign and the new Settings page come in the next betas.
+
+### Changed
+- The quick sheet is now a solid panel. While it is open the shooting controls step aside and the viewfinder shrinks into the strip above it, so ratio and grid changes stay visible. Choices are equal-sized 48 dp circles, long labels become pills, and large text stacks the rows.
+- "JPEG 4:3" now shows once, in the format pill. The lens name shows only while you drag the zoom dial.
+- Smooth, purposeful motion: the sheet rises from the format pill, a yellow ring slides between choices, the pill pulses when its value changes, flash icons cross-fade, and error banners slide in. All of it is skipped when your phone's animation setting is off and during 60 fps video.
+- Scene detection is always on and its setting is removed.
+- Dim front-camera selfies: a dark face gets a little extra exposure, and at high ISO on a steady phone three or four frames are merged. A switch in Settings > Phone > Testing turns this off.
+
+### Added
+- Flash for the front camera in Deep Night: an Off/On screen-light chip that lights the screen before the capture.
+- New stamp styles: AMOLED black bar, colour-adaptive bar, gallery mat border, frosted corner pill and a centered signature layout. Optional 35mm-equivalent focal length, pipeline tag, date and time, rounded-coordinate place tag (no lookup) and your own signature line. Framed Ultra HDR photos now keep their HDR look, and the badge is sharp at any resolution.
+- Deep Night photos now save a capture record too, and Diagnostics counts record failures.
+
+### Fixed
+- Mirrored selfies kept as the camera's own file now open upright in the in-app viewer and editor.
+- Timer selfies keep their face-weighted exposure.
+- The preview is no longer rebuilt in the middle of a capture.
+- Tap-to-meter uses the same zoomed-view frame as face metering.
+- The update check uses the current Android package-info calls.
+
+### Known issues
+- This is a beta: the redesign and the new Settings page are still to come, and several changes could only be tested on the build server, not on a phone. Please report anything odd with Diagnostics > Report a problem.
+
 ## [2.19.3] - 2026-11-24
 
 ### Changed
