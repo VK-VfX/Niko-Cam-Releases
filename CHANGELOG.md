@@ -7,6 +7,19 @@ for each version uses its section of this file as the release notes.
 
 - Nothing yet
 
+## [3.0.0-beta.5] - 2026-11-27
+
+### Fixed
+- Burst HDR no longer comes out dark with a blown-out sky. It used to shoot four frames about 1.1 stops under and brighten them with a curve. It now shoots a dark frame (keeps the clouds), two normal frames and a bright frame (lifts the shadows), fuses them, and holds the result to the viewfinder's brightness.
+- The dark frame goes deeper with the Burst HDR strength (1.2 to 2 stops under), so cloud detail survives in bright skies.
+
+### What to check
+- A cloudy sky from a window or rooftop: clouds keep their shape and the buildings are not black. Compare with your usual camera from the same spot.
+- A dim room: the Burst HDR shot is about as bright as the viewfinder. The saved photo's record should show a parity value near 0.
+
+### Known issues
+- Beta; verified by tests only, not yet on a phone. Settings > Advanced > Comparison tests > the exposure-match switch turns the old four-dark-frames merge back on.
+
 ## [3.0.0-beta.4] - 2026-11-26
 
 ### Fixed
