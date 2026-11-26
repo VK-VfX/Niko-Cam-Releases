@@ -7,6 +7,23 @@ for each version uses its section of this file as the release notes.
 
 - Nothing yet
 
+## [3.0.0-beta.4] - 2026-11-26
+
+### Fixed
+- Zebra stripes and the histogram now use the same brightness weights as the photo pipeline, so what they show matches the saved photo.
+- Focus peaking no longer lights up on sensor noise at high ISO.
+- Noise reduction and sharpening ramp smoothly with the real ISO (boost included) instead of jumping at ISO 800.
+- Panorama stamps now carry the date and, when location is on, the place.
+- The Settings stamp preview shows the DEEP NIGHT box as an example.
+
+### What to check
+- Zebra on a bright green object matches how bright it is in the saved photo.
+- Peaking stays calm in a dark room.
+- A panorama stamp shows the date.
+
+### Known issues
+- Beta; these changes are verified by tests only, not yet on a phone.
+
 ## [3.0.0-beta.3] - 2026-11-25
 
 ### Fixed
