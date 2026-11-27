@@ -7,6 +7,25 @@ for each version uses its section of this file as the release notes.
 
 - Nothing yet
 
+## [3.0.0-beta.6] - 2026-11-27
+
+### Fixed
+- Ultra HDR photos were far too bright in Google Photos (other galleries looked normal). The camera's full HDR boost was being reused on the finished photo. The boost is now capped at 1.5 stops and scaled by a new HDR strength setting.
+- Framed photos no longer glow around the edge of the picture in HDR viewers: the HDR layer now fades out over the picture's outer edge.
+
+### Added
+- HDR strength row in the quick sheet's Pro tab: Soft, Natural (default, about one stop) and Full (the cap). Your choice is remembered.
+- Ultra HDR on/off chip on the camera screen (sun icon, next to the Burst HDR chip). It shows on phones 400 dp wide or more, and not in video or Night; the quick sheet's Pro tab always has the switch.
+
+### What to check
+- A bright-wall selfie and a window shot in Google Photos next to the stock camera: highlights bright but not glaring, skin and mid-tones like the normal JPEG.
+- Try Soft, Natural and Full on the same scene.
+- A photo with a frame or border: no glow around the picture.
+- RAW+JPEG: the JPEG looks like the others. Some galleries hide the DNG file, which is normal.
+
+### Known issues
+- Beta; the brightness is verified by tests only, not yet on a phone. If it is still too bright in Google Photos, send the photo and a Diagnostics report.
+
 ## [3.0.0-beta.5] - 2026-11-27
 
 ### Fixed
