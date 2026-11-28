@@ -7,6 +7,27 @@ for each version uses its section of this file as the release notes.
 
 - Nothing yet
 
+## [3.0.0-beta.7] - 2026-11-28
+
+Polish for the new interface (turn it on with the "New interface" switch at the top of Settings). The classic screen is unchanged. No photo, HDR or flash changes in this build.
+
+### Changed
+- One zoom pill on the bottom edge of the picture (tap = next zoom stop, long press = the zoom dial). It replaces the old zoom chip row, and the video status strip and the format line that were drawn twice are gone.
+- A thin yellow ring around the gallery thumbnail while photos are still processing (it holds still if your phone has animations off).
+- Double-tap the picture to flip between the front and back camera. It does nothing while recording or while a shot is being taken.
+- Plain one-line messages with one action: "The camera isn't available" (Try again) and "Storage is full" (Open storage settings).
+
+### What to check
+- Tap the zoom pill through the stops, and long-press it.
+- Take a photo: the ring shows on the thumbnail and goes away when the photo is ready.
+- Double-tap to flip the camera; try it while recording (it should not flip).
+- Tap to focus still works.
+
+### Known issues
+- A single tap now waits about 0.3 s (the double-tap window) before it focuses in the new interface. Tell me if that feels slow.
+- The storage message appears when a save fails for lack of space, not as an early low-space warning.
+- Beta; verified by tests only, not yet on a phone.
+
 ## [3.0.0-beta.6] - 2026-11-27
 
 ### Fixed
